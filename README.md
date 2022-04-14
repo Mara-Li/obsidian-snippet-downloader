@@ -21,3 +21,7 @@ In setting, you can :
 - `git clone git@github.com:Mara-Li/obsidian-snippet-downloader.git`
 - `npm install`
 - `npm run dev`
+
+*Credit to BRAT-42, where I take some idea and code !*
+
+💡If one day BRAT-42 or Obsidian add a similary function, this plugin will be deleted !
