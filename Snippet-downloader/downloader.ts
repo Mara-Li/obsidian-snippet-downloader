@@ -1,4 +1,6 @@
 import {Octokit} from "@octokit/core";
+import { Base64 } from "js-base64";
+
 import { ResponseHeaders } from "@octokit/types";
 import {normalizePath, Notice, Vault, request} from "obsidian";
 import {
@@ -13,7 +15,6 @@ async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?:
 		if (data.path.endsWith('.css') && !searchExcluded(settings, data.path) && data.path != 'obsidian.css') {
 			const snippetName = data.path
 			const snippetLastUpdate = await grabLastCommitDate(repoPath, data.path);
-			console.log(snippetLastUpdate);
 			snippetList.push({
 				name: snippetName,
 				lastUpdate: snippetLastUpdate
@@ -26,7 +27,6 @@ async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?:
 async function grabLastCommitInfo(repoPath: string, filepath:string) {
 	const repoName = repoPath.replace('https://github.com/', '');
 	const url = `https://api.github.com/repos/${repoName}/commits?path=${encodeURIComponent(filepath)}&page=1&per_page=1`;
-	console.log(url)
 	try {
 		const response = await request({url:url})
 		return (response === "404: Not Found" ? null : JSON.parse(response));
@@ -35,9 +35,9 @@ async function grabLastCommitInfo(repoPath: string, filepath:string) {
 	}
 }
 
-async function grabLastCommitDate(repoPath:string, filepath:string) {
+export async function grabLastCommitDate(repoPath:string, filepath:string) {
 	const test = await grabLastCommitInfo(repoPath, filepath);
-	console.log(repoPath, filepath, test);
+	console.log(`Testing from ${repoPath} : ${filepath} => ${test[0].commit.author.date}`)
 	//@ts-ignore
 	if (test[0].commit.author.date) {
 		//@ts-ignore
@@ -123,7 +123,7 @@ export async function updateSnippet(repoPath: string, snippetList: snippetRepo[]
 	const snippet = snippetList.find(snippet => snippet.repo === repoPath);
 	if (snippet) {
 		for (const snippetContent of snippet.snippetsContents) {
-			if (await checkLastUpdate(snippetContent, repoPath))
+			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(this.settings, snippetContent.name)))
 			{
 				const successDownloaded=await downloadSnippet(repoPath, snippetContent.name, vault)
 				if (successDownloaded) {
@@ -137,7 +137,7 @@ export async function updateSnippet(repoPath: string, snippetList: snippetRepo[]
 
 }
 
-async function downloadSnippet(repoPath: string, snippetName: string, vault:Vault) {
+export async function downloadSnippet(repoPath: string, snippetName: string, vault:Vault) {
 	const repo = repoPath.replace('https://github.com/', '')
 	const owner = repo.split('/')[0]
 	const repoName = repo.split('/')[1]
@@ -151,7 +151,7 @@ async function downloadSnippet(repoPath: string, snippetName: string, vault:Vaul
 			path: snippetName
 		});
 		//@ts-ignore
-		const fileContent = Buffer.from(file.data.content, 'base64').toString('utf8');
+		const fileContent = Base64.decode(file.data.content);
 		const adapter = vault.adapter
 		await adapter.write(filePath, fileContent)
 		return true
