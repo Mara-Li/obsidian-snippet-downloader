@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.2.1...1.3.0) (2022-04-14)
+
+
+### Features
+
+* If snippet can be downloaded, it will be automatically added to excluded snippet. ([e183502](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/e1835023e279845949a546ebfa8444143b668518))
+
 ### [1.2.1](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.2.0...1.2.1) (2022-04-14)
 
 ## [1.2.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.1.0...1.2.0) (2022-04-14)
