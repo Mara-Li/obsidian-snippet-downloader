@@ -4,7 +4,9 @@ import {
 	snippetDownloaderSettings,
 	snippetDownloaderTabs
 } from "./settings";
-import {snippetDownloaderModals} from "./modals";
+import {snippetDownloaderModals} from "./modals/simpleCommands";
+import {repoDownloader} from "./modals/specificRepo";
+import {specificSnippetDownloader} from "./modals/specificSnippet";
 import {addSnippet, updateSnippet} from "./downloader";
 
 export default class snippetDownloader extends Plugin {
@@ -38,9 +40,26 @@ export default class snippetDownloader extends Plugin {
 				await this.saveSettings();
 			}
 		});
+		this.addCommand({
+			id: 'update-specific-repo',
+			name: 'Update specific repository',
+			hotkeys:[],
+			callback: async() => {
+				new repoDownloader(this.app, this.settings, this).open();
+		}
+		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addCommand({
+			id: 'update-specific-snippet',
+			name: 'Update specific snippet',
+			hotkeys:[],
+			callback: async() => {
+				new specificSnippetDownloader(this.app, this.settings, this).open();
+		}
+		});
+
 		this.addSettingTab(new snippetDownloaderTabs(this.app, this));
+
 
 	}
 

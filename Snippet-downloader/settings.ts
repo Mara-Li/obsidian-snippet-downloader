@@ -46,7 +46,7 @@ export class snippetDownloaderTabs extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Excluded Snippet')
-			.setDesc('Type the snippet name you want to exclude from the list, without the extension. Regex can work. Separate by comma.')
+			.setDesc('Type the snippet name you want to exclude from the list, without the extension. Glob can work. Separate by comma.')
 			.addTextArea(text => text
 				.setPlaceholder('BadCSS I hate, badCSS(.*)')
 				.setValue(this.plugin.settings.excludedSnippet)
