@@ -11,7 +11,7 @@ In setting, you can :
 - Delete a repository. Warning ! It will not delete the snippet from your `.obsidian/snippet` folder.
 - Exclude file from the download / update. You can use the name, or a wildcard. 
 
-⚠️ The plugin can't work without the `snippets` folder in your `.obsidian` : you need to create it before use the plugin for the first time.
+⚠️ The plugin can't work without the `snippets` folder in your `.obsidian` : you need to create it before use the plugin for the first time.  
 ⚠️ Each update will erase any edit you made on the snippet !
 
 To update :
