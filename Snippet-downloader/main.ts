@@ -31,31 +31,48 @@ export default class snippetDownloader extends Plugin {
 		this.addCommand({
 			id: 'update-all-snippets',
 			name: 'Update all snippets',
-			callback: async () => {
-				const snippetList = this.settings.snippetList;
-				for (const repoName of snippetList) {
-					await updateSnippet(repoName.repo, snippetList, this.app.vault)
-				}
-				this.settings.snippetList = snippetList;
-				await this.saveSettings();
-			}
+			checkCallback: (checking: boolean) => {
+				if (this.settings.snippetList.length > 0) {
+					if (!checking) {
+						const snippetList = this.settings.snippetList;
+						for (const repoName of snippetList) {
+							updateSnippet(repoName.repo, snippetList, this.app.vault)
+						}
+						this.settings.snippetList = snippetList;
+						this.saveSettings();
+						return true;
+					}
+				} return false;
+			},
 		});
 		this.addCommand({
 			id: 'update-specific-repo',
 			name: 'Update specific repository',
 			hotkeys:[],
-			callback: async() => {
-				new repoDownloader(this.app, this.settings, this).open();
-		}
+			checkCallback: (checking:boolean) => {
+				if (this.settings.snippetList.length > 0){
+					if (!checking) {
+						new repoDownloader(this.app, this.settings, this).open();
+					}
+					return true;
+				}
+				return false;
+			}
 		});
 
 		this.addCommand({
 			id: 'update-specific-snippet',
 			name: 'Update specific snippet',
 			hotkeys:[],
-			callback: async() => {
-				new specificSnippetDownloader(this.app, this.settings, this).open();
-		}
+			checkCallback: (checking:boolean) => {
+				if (this.settings.snippetList.length > 0) {
+					if (!checking) {
+						new specificSnippetDownloader(this.app, this.settings, this).open();
+					}
+					return true;
+				}
+				return false;
+			}
 		});
 
 		this.addSettingTab(new snippetDownloaderTabs(this.app, this));
