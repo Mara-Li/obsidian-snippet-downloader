@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.1.0...1.2.0) (2022-04-14)
+
+
+### Features
+
+* Adding checkCallback to avoid commands list if no snippet donwloaded ([0d2a7c1](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/0d2a7c1e73af1ac46e9f6e96b425fc30835866a4))
+
 ## [1.1.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.0.0...1.1.0) (2022-04-14)
 
 
