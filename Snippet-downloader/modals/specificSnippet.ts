@@ -16,16 +16,15 @@ interface snippetUpdate {
 async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownloaderSettings) {
 	const listSnippet = settings.snippetList
 	const snippet = listSnippet.find(snippet => snippet.repo === item.repo);
-	for (const contents of snippet.snippetsContents) {
-		if (contents.name === item.snippetPath && await checkLastUpdate(contents, item.repo)) {
-			const successDownload = await downloadSnippet(item.repo, contents.name, this.app.vault);
-			if (successDownload) {
-				contents.lastUpdate = await grabLastCommitDate(item.repo, contents.name);
-				new Notice (`${basename(item.snippetPath)} has been updated 🎉`);
-				return listSnippet;
-			} else {
-				console.log("Error downloading snippet");
-			}
+	const snippetsRep = snippet.snippetsContents.find(snippet => snippet.name === item.snippetPath);
+	if (await checkLastUpdate(snippetsRep, item.repo)) {
+		const successDownload = await downloadSnippet(item.repo, snippetsRep.name, this.app.vault);
+		if (successDownload) {
+			snippetsRep.lastUpdate = await grabLastCommitDate(item.repo, snippetsRep.name);
+			new Notice(`${basename(item.snippetPath)} has been updated 🎉`);
+			return listSnippet;
+		} else {
+			console.log("Error downloading snippet");
 		}
 	}
 	new Notice (`${basename(item.snippetPath)} is already up to date 💡`);
