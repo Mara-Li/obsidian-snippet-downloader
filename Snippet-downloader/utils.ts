@@ -1,12 +1,12 @@
-import {snippetDownloaderSettings} from "./settings";
 import globRegex from 'glob-regex';
-export function searchExcluded(settings: snippetDownloaderSettings, name: string): boolean {
-	if (settings.excludedSnippet.length < 1) {
+
+export function searchExcluded(excludedSnippet: string, name: string): boolean {
+	if (excludedSnippet.length < 1) {
 		return false;
 	}
-	const excluded = settings.excludedSnippet.split(",");
+	const excluded = excludedSnippet.split(",");
 	for (const excl of excluded){
-		if (excl.trim() === name.replace('.css', '')){
+		if (excl.trim() === name.replace('.css', '').trim()){
 			return true;
 		}
 		const regExcl = globRegex(excl.trim());

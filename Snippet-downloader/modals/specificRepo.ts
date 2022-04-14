@@ -1,5 +1,5 @@
 import {App, FuzzySuggestModal} from "obsidian";
-import {snippetDownloaderSettings} from "../settings";
+import {snippetDownloaderSettings, snippetRepo} from "../settings";
 import {updateSnippet} from "../downloader";
 import snippetDownloader from "../main";
 
@@ -38,7 +38,9 @@ export class repoDownloader extends FuzzySuggestModal<repoUpdate> {
 	}
 
 	async onChooseItem(item: repoUpdate, evt: MouseEvent | KeyboardEvent) {
-		this.settings.snippetList = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault);
+		const allSettings = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet);
+		this.settings.snippetList =<snippetRepo[]>allSettings[0];
+		this.settings.excludedSnippet=<string>allSettings[1];
 		await this.plugin.saveSettings();
 	}
 

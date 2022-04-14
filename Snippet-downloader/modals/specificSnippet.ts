@@ -1,6 +1,6 @@
 import {App, FuzzySuggestModal, Notice} from "obsidian";
 import snippetDownloader from "../main";
-import {snippetDownloaderSettings} from "../settings";
+import {snippetDownloaderSettings, snippetRepo} from "../settings";
 import {
 	checkLastUpdate,
 	downloadSnippet,
@@ -15,6 +15,7 @@ interface snippetUpdate {
 
 async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownloaderSettings) {
 	const listSnippet = settings.snippetList
+	const excludedSnippet = settings.excludedSnippet
 	const snippet = listSnippet.find(snippet => snippet.repo === item.repo);
 	const snippetsRep = snippet.snippetsContents.find(snippet => snippet.name === item.snippetPath);
 	if (await checkLastUpdate(snippetsRep, item.repo)) {
@@ -22,13 +23,16 @@ async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownl
 		if (successDownload) {
 			snippetsRep.lastUpdate = await grabLastCommitDate(item.repo, snippetsRep.name);
 			new Notice(`${basename(item.snippetPath)} has been updated 🎉`);
-			return listSnippet;
+				return [listSnippet,
+						excludedSnippet];
 		} else {
-			console.log("Error downloading snippet");
+				return [listSnippet,
+						excludedSnippet + ", " + item.snippetPath.replace('.css', '')];
 		}
 	}
 	new Notice (`${basename(item.snippetPath)} is already up to date 💡`);
-	return listSnippet;
+	return [listSnippet,
+			excludedSnippet];
 }
 
 
@@ -36,7 +40,7 @@ function getAllSnippet(settings: snippetDownloaderSettings) {
 	const allSnippet: snippetUpdate[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {
-			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings, snippetContent.name)) {
+			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings.excludedSnippet, snippetContent.name)) {
 				allSnippet.push({
 				repo: snippet.repo,
 				snippetPath: snippetContent.name,
@@ -67,7 +71,9 @@ export class specificSnippetDownloader extends FuzzySuggestModal<snippetUpdate> 
 	}
 
 	async onChooseItem(item: snippetUpdate, evt: MouseEvent | KeyboardEvent) {
-		this.settings.snippetList = await updateSpecificSnippet(item, this.settings);
+		const newList = await updateSpecificSnippet(item, this.settings);
+		this.settings.snippetList = <snippetRepo[]>newList[0];
+		this.settings.excludedSnippet = <string>newList[1];
 		await this.plugin.saveSettings();
 	}
 }

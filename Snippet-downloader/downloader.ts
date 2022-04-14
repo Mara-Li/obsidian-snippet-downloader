@@ -10,9 +10,10 @@ import {
 } from "./settings";
 import {searchExcluded, basename} from "./utils";
 
+//@ts-ignore
 async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?: 200; url?: string; data: any; }, snippetList: snippetInformation[], settings: snippetDownloaderSettings, repoPath: string) {
 	for (const data of repoRecur.data.tree) {
-		if (data.path.endsWith('.css') && !searchExcluded(settings, data.path) && data.path != 'obsidian.css') {
+		if (data.path.endsWith('.css') && !searchExcluded(this.settings.excludedSnippet, data.path) && data.path != 'obsidian.css') {
 			const snippetName = data.path
 			const snippetLastUpdate = await grabLastCommitDate(repoPath, data.path);
 			snippetList.push({
@@ -119,22 +120,24 @@ export async function checkLastUpdate(snippetName:snippetInformation, repoPath: 
 	return (oldDate < newDate)
 }
 
-export async function updateSnippet(repoPath: string, snippetList: snippetRepo[], vault: Vault) {
+export async function updateSnippet(repoPath: string, snippetList: snippetRepo[], vault: Vault, excludedSnippets: string) {
 	const snippet = snippetList.find(snippet => snippet.repo === repoPath);
+	let excludedSnippet = excludedSnippets;
 	if (snippet) {
 		for (const snippetContent of snippet.snippetsContents) {
-			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(this.settings, snippetContent.name)))
+			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(excludedSnippet, snippetContent.name)))
 			{
 				const successDownloaded=await downloadSnippet(repoPath, snippetContent.name, vault)
 				if (successDownloaded) {
 					snippetContent.lastUpdate = await grabLastCommitDate(repoPath, snippetContent.name);
+				} else {
+					excludedSnippet += ', ' + snippetContent.name.replace('.css', '');
 				}
 			}
 		}
 	}
 	new Notice(`${repoPath} successfully updated 🎉`);
-	return snippetList;
-
+	return [excludedSnippet, snippetList];
 }
 
 export async function downloadSnippet(repoPath: string, snippetName: string, vault:Vault) {
@@ -150,11 +153,15 @@ export async function downloadSnippet(repoPath: string, snippetName: string, vau
 			repo: repoName,
 			path: snippetName
 		});
-		//@ts-ignore
-		const fileContent = Base64.decode(file.data.content);
-		const adapter = vault.adapter
-		await adapter.write(filePath, fileContent)
-		return true
+		if (file.status === 200) {
+			// @ts-ignore
+			const fileContent = Base64.decode(file.data.content);
+			const adapter = vault.adapter
+			await adapter.write(filePath, fileContent)
+			return true
+		} else {
+			return false
+		}
 	} catch (e) {
 		console.log(e)
 	}

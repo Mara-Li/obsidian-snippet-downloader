@@ -2,7 +2,7 @@ import {Plugin} from 'obsidian';
 import {
 	DEFAULT_SETTINGS,
 	snippetDownloaderSettings,
-	snippetDownloaderTabs
+	snippetDownloaderTabs, snippetRepo
 } from "./settings";
 import {snippetDownloaderModals} from "./modals/simpleCommands";
 import {repoDownloader} from "./modals/specificRepo";
@@ -31,20 +31,26 @@ export default class snippetDownloader extends Plugin {
 		this.addCommand({
 			id: 'update-all-snippets',
 			name: 'Update all snippets',
-			checkCallback: (checking: boolean) => {
+			checkCallback: async (checking: boolean) => {
 				if (this.settings.snippetList.length > 0) {
 					if (!checking) {
 						const snippetList = this.settings.snippetList;
+						const excludedSnippet = this.settings.excludedSnippet;
+						let updatedSettings = [excludedSnippet, snippetList];
 						for (const repoName of snippetList) {
-							updateSnippet(repoName.repo, snippetList, this.app.vault)
+							//@ts-ignore
+							updatedSettings= await updateSnippet(repoName.repo, snippetList, this.app.vault, excludedSnippet);
+							this.settings.snippetList = <snippetRepo[]>updatedSettings[1];
+							this.settings.excludedSnippet = <string>updatedSettings[0];
 						}
-						this.settings.snippetList = snippetList;
-						this.saveSettings();
-						return true;
+						await this.saveSettings();
 					}
+					return true;
+
 				} return false;
-			},
+			}
 		});
+
 		this.addCommand({
 			id: 'update-specific-repo',
 			name: 'Update specific repository',
