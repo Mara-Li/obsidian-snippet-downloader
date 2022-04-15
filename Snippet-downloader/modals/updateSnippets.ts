@@ -1,6 +1,6 @@
-import {App, FuzzySuggestModal, Notice} from "obsidian";
+import {App, FuzzySuggestModal} from "obsidian";
 import {snippetDownloaderSettings, snippetRepo} from "../settings";
-import {updateSnippet, checkLastUpdate, downloadSnippet, grabLastCommitDate} from "../downloader";
+import {updateRepo, updateSpecificSnippet} from "../addSnippets";
 import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
 
@@ -9,31 +9,9 @@ interface repoUpdate {
 	repoUrl: string;
 }
 
-interface snippetUpdate {
+export interface snippetUpdate {
 	repo: string;
 	snippetPath: string;
-}
-
-async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownloaderSettings) {
-	const listSnippet = settings.snippetList
-	const excludedSnippet = settings.errorSnippet
-	const snippet = listSnippet.find(snippet => snippet.repo === item.repo);
-	const snippetsRep = snippet.snippetsContents.find(snippet => snippet.name === item.snippetPath);
-	if (await checkLastUpdate(snippetsRep, item.repo)) {
-		const successDownload = await downloadSnippet(item.repo, snippetsRep.name, this.app.vault);
-		if (successDownload) {
-			snippetsRep.lastUpdate = await grabLastCommitDate(item.repo, snippetsRep.name);
-			new Notice(`${basename(item.snippetPath)} has been updated 🎉`);
-				return [listSnippet,
-						excludedSnippet];
-		} else {
-				return [listSnippet,
-						excludedSnippet + item.snippetPath.replace('.css', '')] + ', ';
-		}
-	}
-	new Notice (`${basename(item.snippetPath)} is already up to date 💡`);
-	return [listSnippet,
-			excludedSnippet];
 }
 
 function getAllRepo(settings: snippetDownloaderSettings){
@@ -81,9 +59,9 @@ export class repoDownloader extends FuzzySuggestModal<repoUpdate> {
 	}
 
 	async onChooseItem(item: repoUpdate, evt: MouseEvent | KeyboardEvent) {
-		const allSettings = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet, this.settings.errorSnippet);
-		this.settings.snippetList =<snippetRepo[]>allSettings[0];
-		this.settings.errorSnippet=<string>allSettings[1];
+		const allSettings = await updateRepo(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet, this.settings.errorSnippet);
+		this.settings.snippetList =<snippetRepo[]>allSettings[1];
+		this.settings.errorSnippet=<string>allSettings[0];
 		await this.plugin.saveSettings();
 	}
 
