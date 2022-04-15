@@ -5,8 +5,7 @@ import {
 	snippetDownloaderTabs, snippetRepo
 } from "./settings";
 import {snippetDownloaderModals} from "./modals/simpleCommands";
-import {repoDownloader} from "./modals/specificRepo";
-import {specificSnippetDownloader} from "./modals/specificSnippet";
+import {repoDownloader, specificSnippetDownloader} from "./modals/updateSnippets";
 import {addSnippet, updateSnippet} from "./downloader";
 
 export default class snippetDownloader extends Plugin {

@@ -1,12 +1,13 @@
 import {App, FuzzySuggestModal, Notice} from "obsidian";
-import snippetDownloader from "../main";
 import {snippetDownloaderSettings, snippetRepo} from "../settings";
-import {
-	checkLastUpdate,
-	downloadSnippet,
-	grabLastCommitDate
-} from "../downloader";
+import {updateSnippet, checkLastUpdate, downloadSnippet, grabLastCommitDate} from "../downloader";
+import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
+
+interface repoUpdate {
+	repoName: string;
+	repoUrl: string;
+}
 
 interface snippetUpdate {
 	repo: string;
@@ -35,6 +36,16 @@ async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownl
 			excludedSnippet];
 }
 
+function getAllRepo(settings: snippetDownloaderSettings){
+	const repoAll=[];
+	for(const repo of settings.snippetList){
+		repoAll.push({
+			repoName: repo.repo,
+			repoUrl: ''
+		});
+	}
+	return repoAll
+}
 
 function getAllSnippet(settings: snippetDownloaderSettings) {
 	const allSnippet: snippetUpdate[] = [];
@@ -49,6 +60,33 @@ function getAllSnippet(settings: snippetDownloaderSettings) {
 		}
 	}
 	return allSnippet
+}
+
+export class repoDownloader extends FuzzySuggestModal<repoUpdate> {
+	app: App;
+	settings: snippetDownloaderSettings;
+	plugin: snippetDownloader;
+
+	constructor(app: App, settings: snippetDownloaderSettings, plugin:snippetDownloader){
+		super(app);
+		this.settings = settings;
+		this.plugin = plugin;
+	}
+
+	getItemText(item: repoUpdate): string {
+		return item.repoName
+	}
+	getItems(): repoUpdate[] {
+		return getAllRepo(this.settings)
+	}
+
+	async onChooseItem(item: repoUpdate, evt: MouseEvent | KeyboardEvent) {
+		const allSettings = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet);
+		this.settings.snippetList =<snippetRepo[]>allSettings[0];
+		this.settings.excludedSnippet=<string>allSettings[1];
+		await this.plugin.saveSettings();
+	}
+
 }
 
 export class specificSnippetDownloader extends FuzzySuggestModal<snippetUpdate> {
