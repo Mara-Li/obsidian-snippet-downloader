@@ -13,7 +13,7 @@ import {searchExcluded, basename} from "./utils";
 //@ts-ignore
 async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?: 200; url?: string; data: any; }, snippetList: snippetInformation[], settings: snippetDownloaderSettings, repoPath: string) {
 	for (const data of repoRecur.data.tree) {
-		if (data.path.endsWith('.css') && !searchExcluded(this.settings.excludedSnippet, data.path) && data.path != 'obsidian.css') {
+		if (data.path.endsWith('.css') && !searchExcluded(settings.excludedSnippet, data.path) && data.path != 'obsidian.css') {
 			const snippetName = data.path
 			const snippetLastUpdate = await grabLastCommitDate(repoPath, data.path);
 			snippetList.push({
@@ -54,6 +54,7 @@ async function listSnippetfromRepo(repoPath: string, settings: snippetDownloader
 	const repo = repoPath.replace('https://github.com/', '')
 	const owner = repo.split('/')[0]
 	const repoName = repo.split('/')[1]
+	console.log(`Repo: ${repoPath}, owner: ${owner}, repoName: ${repoName}`)
 	const snippetList: snippetInformation[] | PromiseLike<snippetInformation[]> = [];
 	try {
 		const repoRecur = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
@@ -83,6 +84,7 @@ async function listSnippetfromRepo(repoPath: string, settings: snippetDownloader
 
 export async function addSnippet(repoPath: string, settings: snippetDownloaderSettings, vault: Vault) {
 	const snippetList = settings.snippetList;
+	let excludedSnippet = settings.excludedSnippet;
 	if (!snippetList.some(snippet => snippet.repo === repoPath)) {
 		const newSnippetList = await listSnippetfromRepo(repoPath, settings);
 		if (newSnippetList.length === 0) {
@@ -95,13 +97,17 @@ export async function addSnippet(repoPath: string, settings: snippetDownloaderSe
 		})
 		const snippet = snippetList.find(snippet => snippet.repo === repoPath)
 		for (const snippetContents of snippet.snippetsContents) {
-			await downloadSnippet(repoPath, snippetContents.name, vault)
+			const Success=await downloadSnippet(repoPath, snippetContents.name, vault)
+			if (!Success) {
+				excludedSnippet += ', ' + snippetContents.name
+			}
 		}
 		new Notice('Repository successfully added 🎉');
-		return snippetList
+		return [snippetList, excludedSnippet]
 	}
 	new Notice ('Error : this repo is already in the list 😿');
-	return snippetList
+	return [snippetList, excludedSnippet]
+
 }
 
 export function removeSnippet(repoPath: string, snippetList: snippetRepo[]) {
