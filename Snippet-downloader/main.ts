@@ -6,7 +6,7 @@ import {
 } from "./settings";
 import {snippetDownloaderModals} from "./modals/simpleCommands";
 import {repoDownloader, specificSnippetDownloader} from "./modals/updateSnippets";
-import {addSnippet, updateSnippet} from "./downloader";
+import {addSnippet, updateRepo} from "./addSnippets";
 
 export default class snippetDownloader extends Plugin {
 	settings: snippetDownloaderSettings;
@@ -41,7 +41,7 @@ export default class snippetDownloader extends Plugin {
 						let updatedSettings = [errorSnippet, snippetList];
 						for (const repoName of snippetList) {
 							//@ts-ignore
-							updatedSettings= await updateSnippet(repoName.repo, snippetList, this.app.vault, excludedSnippet, errorSnippet);
+							updatedSettings= await updateRepo(repoName.repo, snippetList, this.app.vault, excludedSnippet, errorSnippet);
 							this.settings.snippetList = <snippetRepo[]>updatedSettings[1];
 							this.settings.errorSnippet = <string>updatedSettings[0];
 						}

@@ -14,6 +14,7 @@ export function searchExcluded(excludedSnippet: string, name: string): boolean {
 			return true;
 		}
 	}
+	return false;
 }
 
 export function basename(path: string) {

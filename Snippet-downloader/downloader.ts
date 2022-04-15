@@ -1,12 +1,10 @@
 import {Octokit} from "@octokit/core";
 import { Base64 } from "js-base64";
-
 import { ResponseHeaders } from "@octokit/types";
-import {normalizePath, Notice, Vault, request} from "obsidian";
+import {normalizePath, Vault, request} from "obsidian";
 import {
 	snippetDownloaderSettings,
 	snippetInformation,
-	snippetRepo
 } from "./settings";
 import {searchExcluded, basename} from "./utils";
 
@@ -48,8 +46,7 @@ export async function grabLastCommitDate(repoPath:string, filepath:string) {
 	}
 }
 
-
-async function listSnippetfromRepo(repoPath: string, settings: snippetDownloaderSettings): Promise<snippetInformation[]> {
+export async function listSnippetfromRepo(repoPath: string, settings: snippetDownloaderSettings): Promise<snippetInformation[]> {
 	const octokit = new Octokit();
 	const repo = repoPath.replace('https://github.com/', '')
 	const owner = repo.split('/')[0]
@@ -81,86 +78,10 @@ async function listSnippetfromRepo(repoPath: string, settings: snippetDownloader
 	}
 }
 
-
-export async function addSnippet(repoPath: string, settings: snippetDownloaderSettings, vault: Vault) {
-	const snippetList = settings.snippetList;
-	let excludedSnippet = settings.errorSnippet;
-	const catchErrors: string[] = [];
-	if (!snippetList.some(snippet => snippet.repo === repoPath)) {
-		const newSnippetList = await listSnippetfromRepo(repoPath, settings);
-		if (newSnippetList.length === 0) {
-			new Notice('Error 😿, snippet or repository not found')
-			return snippetList;
-		}
-		snippetList.push({
-			repo: repoPath,
-			snippetsContents: await listSnippetfromRepo(repoPath, settings)
-		})
-		const snippet = snippetList.find(snippet => snippet.repo === repoPath)
-		for (const snippetContents of snippet.snippetsContents) {
-			const Success=await downloadSnippet(repoPath, snippetContents.name, vault)
-			if (!Success) {
-				excludedSnippet += snippetContents.name.replace('.css', '') + ', ';
-				catchErrors.push(snippetContents.name.replace('.css', ''));
-			}
-		}
-		let messageNotice = `Successfully added ${repoPath}. ${newSnippetList.length} snippets added. 🎉`
-		if (catchErrors.length > 0) {
-			messageNotice += `\n${catchErrors.length} snippets not added😿: ${catchErrors.join(', ')}`
-		}
-		new Notice(messageNotice);
-		return [snippetList, excludedSnippet]
-	}
-	new Notice ('Error : this repo is already in the list 😿');
-	return [snippetList, excludedSnippet]
-}
-
-function removeErrorSnippet(repoPath: string, errorSnippet: string, snippetList: snippetRepo[]){
-	const snippet = snippetList.find(snippet => snippet.repo === repoPath)
-	let errorSnippetList = errorSnippet.split(', ');
-	for (const snippetContents of snippet.snippetsContents) {
-		errorSnippetList=errorSnippetList.filter(v=>v!=snippetContents.name.replace('.css', '').trim());
-	}
-	console.log(errorSnippetList)
-	return errorSnippetList.join(', ');
-}
-
-export function removeSnippet(repoPath: string, snippetList: snippetRepo[], errorSnippet: string) {
-	if (snippetList.some(snippet => snippet.repo === repoPath)) {
-		errorSnippet = removeErrorSnippet(repoPath, errorSnippet, snippetList)
-		snippetList.splice(snippetList.findIndex(snippet => snippet.repo === repoPath), 1)
-		new Notice('Repository successfully removed 🎉');
-		return [snippetList, errorSnippet]
-	}
-	new Notice ('Error : this repo is not in the list 😿');
-	return [snippetList, errorSnippet]
-
-}
-
 export async function checkLastUpdate(snippetName:snippetInformation, repoPath: string) {
 	const oldDate = new Date (snippetName.lastUpdate);
 	const newDate= new Date(await grabLastCommitDate(repoPath, snippetName.name));
 	return (oldDate < newDate)
-}
-
-export async function updateSnippet(repoPath: string, snippetList: snippetRepo[], vault: Vault, excludedSnippets: string, errorSnippets: string) {
-	const snippet = snippetList.find(snippet => snippet.repo === repoPath);
-
-	if (snippet) {
-		for (const snippetContent of snippet.snippetsContents) {
-			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(excludedSnippets, snippetContent.name)) && (!searchExcluded(errorSnippets, snippetContent.name)))
-			{
-				const successDownloaded=await downloadSnippet(repoPath, snippetContent.name, vault)
-				if (successDownloaded) {
-					snippetContent.lastUpdate = await grabLastCommitDate(repoPath, snippetContent.name);
-				} else {
-					errorSnippets += snippetContent.name.replace('.css', '') + ', ';
-				}
-			}
-		}
-	}
-	new Notice(`${repoPath} successfully updated 🎉`);
-	return [errorSnippets, snippetList];
 }
 
 export async function downloadSnippet(repoPath: string, snippetName: string, vault:Vault) {

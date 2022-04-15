@@ -5,7 +5,7 @@ import {
 	ButtonComponent
 } from "obsidian";
 import snippetDownloader from "./main";
-import {removeSnippet} from "./downloader";
+import {removeSnippet} from "./removeSnippet";
 
 export interface snippetInformation {
   name: string;
