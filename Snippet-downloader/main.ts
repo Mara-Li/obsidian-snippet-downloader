@@ -6,6 +6,7 @@ import {
 } from "./settings";
 import {snippetDownloaderModals} from "./modals/simpleCommands";
 import {repoDownloader, specificSnippetDownloader} from "./modals/updateSnippets";
+import {excludeSnippet} from "./modals/excludeSnippet";
 import {addSnippet, updateRepo} from "./addSnippets";
 
 export default class snippetDownloader extends Plugin {
@@ -82,6 +83,21 @@ export default class snippetDownloader extends Plugin {
 				return false;
 			}
 		});
+
+		this.addCommand({
+			id: 'remove-specific-snippet',
+			name: 'Exclude specific snippet',
+			hotkeys:[],
+			checkCallback: (checking:boolean) => {
+				if (this.settings.snippetList.length > 0) {
+					if (!checking) {
+						new excludeSnippet(this.app, this.settings, this).open();
+					}
+					return true;
+				}
+				return false;
+			}
+		})
 
 		this.addSettingTab(new snippetDownloaderTabs(this.app, this));
 
