@@ -13,7 +13,7 @@ import {searchExcluded, basename} from "./utils";
 //@ts-ignore
 async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?: 200; url?: string; data: any; }, snippetList: snippetInformation[], settings: snippetDownloaderSettings, repoPath: string) {
 	for (const data of repoRecur.data.tree) {
-		if (data.path.endsWith('.css') && !searchExcluded(settings.excludedSnippet, data.path) && data.path != 'obsidian.css') {
+		if (data.path.endsWith('.css') && !searchExcluded(settings.excludedSnippet, data.path) && data.path != 'obsidian.css' && !searchExcluded(settings.errorSnippet, data.path)) {
 			const snippetName = data.path
 			const snippetLastUpdate = await grabLastCommitDate(repoPath, data.path);
 			snippetList.push({
@@ -84,7 +84,8 @@ async function listSnippetfromRepo(repoPath: string, settings: snippetDownloader
 
 export async function addSnippet(repoPath: string, settings: snippetDownloaderSettings, vault: Vault) {
 	const snippetList = settings.snippetList;
-	let excludedSnippet = settings.excludedSnippet;
+	let excludedSnippet = settings.errorSnippet;
+	const catchErrors: string[] = [];
 	if (!snippetList.some(snippet => snippet.repo === repoPath)) {
 		const newSnippetList = await listSnippetfromRepo(repoPath, settings);
 		if (newSnippetList.length === 0) {
@@ -99,25 +100,41 @@ export async function addSnippet(repoPath: string, settings: snippetDownloaderSe
 		for (const snippetContents of snippet.snippetsContents) {
 			const Success=await downloadSnippet(repoPath, snippetContents.name, vault)
 			if (!Success) {
-				excludedSnippet += ', ' + snippetContents.name
+				excludedSnippet += snippetContents.name.replace('.css', '') + ', ';
+				catchErrors.push(snippetContents.name.replace('.css', ''));
 			}
 		}
-		new Notice('Repository successfully added 🎉');
+		let messageNotice = `Successfully added ${repoPath}. ${newSnippetList.length} snippets added. 🎉`
+		if (catchErrors.length > 0) {
+			messageNotice += `\n${catchErrors.length} snippets not added😿: ${catchErrors.join(', ')}`
+		}
+		new Notice(messageNotice);
 		return [snippetList, excludedSnippet]
 	}
 	new Notice ('Error : this repo is already in the list 😿');
 	return [snippetList, excludedSnippet]
-
 }
 
-export function removeSnippet(repoPath: string, snippetList: snippetRepo[]) {
+function removeErrorSnippet(repoPath: string, errorSnippet: string, snippetList: snippetRepo[]){
+	const snippet = snippetList.find(snippet => snippet.repo === repoPath)
+	let errorSnippetList = errorSnippet.split(', ');
+	for (const snippetContents of snippet.snippetsContents) {
+		errorSnippetList=errorSnippetList.filter(v=>v!=snippetContents.name.replace('.css', '').trim());
+	}
+	console.log(errorSnippetList)
+	return errorSnippetList.join(', ');
+}
+
+export function removeSnippet(repoPath: string, snippetList: snippetRepo[], errorSnippet: string) {
 	if (snippetList.some(snippet => snippet.repo === repoPath)) {
+		errorSnippet = removeErrorSnippet(repoPath, errorSnippet, snippetList)
 		snippetList.splice(snippetList.findIndex(snippet => snippet.repo === repoPath), 1)
 		new Notice('Repository successfully removed 🎉');
-		return snippetList
+		return [snippetList, errorSnippet]
 	}
 	new Notice ('Error : this repo is not in the list 😿');
-	return snippetList
+	return [snippetList, errorSnippet]
+
 }
 
 export async function checkLastUpdate(snippetName:snippetInformation, repoPath: string) {
@@ -126,24 +143,24 @@ export async function checkLastUpdate(snippetName:snippetInformation, repoPath: 
 	return (oldDate < newDate)
 }
 
-export async function updateSnippet(repoPath: string, snippetList: snippetRepo[], vault: Vault, excludedSnippets: string) {
+export async function updateSnippet(repoPath: string, snippetList: snippetRepo[], vault: Vault, excludedSnippets: string, errorSnippets: string) {
 	const snippet = snippetList.find(snippet => snippet.repo === repoPath);
-	let excludedSnippet = excludedSnippets;
+
 	if (snippet) {
 		for (const snippetContent of snippet.snippetsContents) {
-			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(excludedSnippet, snippetContent.name)))
+			if (await checkLastUpdate(snippetContent, repoPath) && (snippetContent.name !== 'obsidian.css') && (!searchExcluded(excludedSnippets, snippetContent.name)) && (!searchExcluded(errorSnippets, snippetContent.name)))
 			{
 				const successDownloaded=await downloadSnippet(repoPath, snippetContent.name, vault)
 				if (successDownloaded) {
 					snippetContent.lastUpdate = await grabLastCommitDate(repoPath, snippetContent.name);
 				} else {
-					excludedSnippet += ', ' + snippetContent.name.replace('.css', '');
+					errorSnippets += snippetContent.name.replace('.css', '') + ', ';
 				}
 			}
 		}
 	}
 	new Notice(`${repoPath} successfully updated 🎉`);
-	return [excludedSnippet, snippetList];
+	return [errorSnippets, snippetList];
 }
 
 export async function downloadSnippet(repoPath: string, snippetName: string, vault:Vault) {

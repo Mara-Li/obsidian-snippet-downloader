@@ -16,7 +16,7 @@ interface snippetUpdate {
 
 async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownloaderSettings) {
 	const listSnippet = settings.snippetList
-	const excludedSnippet = settings.excludedSnippet
+	const excludedSnippet = settings.errorSnippet
 	const snippet = listSnippet.find(snippet => snippet.repo === item.repo);
 	const snippetsRep = snippet.snippetsContents.find(snippet => snippet.name === item.snippetPath);
 	if (await checkLastUpdate(snippetsRep, item.repo)) {
@@ -28,7 +28,7 @@ async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownl
 						excludedSnippet];
 		} else {
 				return [listSnippet,
-						excludedSnippet + ", " + item.snippetPath.replace('.css', '')];
+						excludedSnippet + item.snippetPath.replace('.css', '')] + ', ';
 		}
 	}
 	new Notice (`${basename(item.snippetPath)} is already up to date 💡`);
@@ -51,7 +51,7 @@ function getAllSnippet(settings: snippetDownloaderSettings) {
 	const allSnippet: snippetUpdate[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {
-			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings.excludedSnippet, snippetContent.name)) {
+			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings.excludedSnippet, snippetContent.name) && !searchExcluded(settings.errorSnippet, snippetContent.name)) {
 				allSnippet.push({
 				repo: snippet.repo,
 				snippetPath: snippetContent.name,
@@ -81,9 +81,9 @@ export class repoDownloader extends FuzzySuggestModal<repoUpdate> {
 	}
 
 	async onChooseItem(item: repoUpdate, evt: MouseEvent | KeyboardEvent) {
-		const allSettings = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet);
+		const allSettings = await updateSnippet(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet, this.settings.errorSnippet);
 		this.settings.snippetList =<snippetRepo[]>allSettings[0];
-		this.settings.excludedSnippet=<string>allSettings[1];
+		this.settings.errorSnippet=<string>allSettings[1];
 		await this.plugin.saveSettings();
 	}
 
@@ -111,7 +111,7 @@ export class specificSnippetDownloader extends FuzzySuggestModal<snippetUpdate> 
 	async onChooseItem(item: snippetUpdate, evt: MouseEvent | KeyboardEvent) {
 		const newList = await updateSpecificSnippet(item, this.settings);
 		this.settings.snippetList = <snippetRepo[]>newList[0];
-		this.settings.excludedSnippet = <string>newList[1];
+		this.settings.errorSnippet = <string>newList[1];
 		await this.plugin.saveSettings();
 	}
 }

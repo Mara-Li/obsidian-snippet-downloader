@@ -20,7 +20,9 @@ export default class snippetDownloader extends Plugin {
 			callback: ()=> {
 				new snippetDownloaderModals(this.app, async (result) => {
 					if (result) {
-						this.settings.snippetList = await addSnippet(result, this.settings, this.app.vault);
+						const newSettings = await addSnippet(result.trim(), this.settings, this.app.vault);
+						this.settings.snippetList = <snippetRepo[]>newSettings[0]
+						this.settings.errorSnippet = <string>newSettings[1]
 						await this.saveSettings();
 					}
 				}).open();
@@ -34,13 +36,14 @@ export default class snippetDownloader extends Plugin {
 				if (this.settings.snippetList.length > 0) {
 					if (!checking) {
 						const snippetList = this.settings.snippetList;
+						const errorSnippet = this.settings.errorSnippet;
 						const excludedSnippet = this.settings.excludedSnippet;
-						let updatedSettings = [excludedSnippet, snippetList];
+						let updatedSettings = [errorSnippet, snippetList];
 						for (const repoName of snippetList) {
 							//@ts-ignore
-							updatedSettings= await updateSnippet(repoName.repo, snippetList, this.app.vault, excludedSnippet);
+							updatedSettings= await updateSnippet(repoName.repo, snippetList, this.app.vault, excludedSnippet, errorSnippet);
 							this.settings.snippetList = <snippetRepo[]>updatedSettings[1];
-							this.settings.excludedSnippet = <string>updatedSettings[0];
+							this.settings.errorSnippet = <string>updatedSettings[0];
 						}
 						await this.saveSettings();
 					}

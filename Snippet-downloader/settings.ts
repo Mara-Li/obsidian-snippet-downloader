@@ -19,12 +19,14 @@ export interface snippetRepo {
 
 export interface snippetDownloaderSettings {
 	snippetList:snippetRepo[];
-	excludedSnippet:string
+	excludedSnippet:string;
+	errorSnippet: string;
 }
 
 export const DEFAULT_SETTINGS: snippetDownloaderSettings = {
 	snippetList: [],
-	excludedSnippet: ""
+	excludedSnippet: "",
+	errorSnippet: "",
 };
 
 
@@ -73,8 +75,9 @@ export class snippetDownloaderTabs extends PluginSettingTab {
 					btn.setTooltip("Delete this repository from the list");
 					btn.onClick(async()=>{
 						btn.buttonEl.parentElement.remove();
-						this.plugin.settings.snippetList=removeSnippet(repoPath.repo, this.plugin.settings.snippetList);
-						console.log(this.plugin.settings.snippetList)
+						const newSettings=removeSnippet(repoPath.repo, this.plugin.settings.snippetList, this.plugin.settings.errorSnippet);
+						this.plugin.settings.snippetList=<snippetRepo[]>newSettings[0]
+						this.plugin.settings.errorSnippet=<string>newSettings[1]
 						await this.plugin.saveSettings();
 					})
 				})
