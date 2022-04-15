@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.3.0...1.4.0) (2022-04-15)
+
+
+### Features
+
+* Clean data.json file when repo is excluded ([f23844c](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/f23844c42959f13a4418d42c95f07b856e5fcb36))
+* You can now add to exclude specific snippet. ([93c0a06](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/93c0a0639cb1506d75d657c5179e1a042ca0b124))
+
+
+### Bug Fixes
+
+* Exclude error downloaded snippet ([7b4319d](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/7b4319d2a36c346022a90cc200699cf1fdd83784))
+* Repo not found using owner/repo ([f4b56c7](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/f4b56c72fce2d00367c816f0553cd8da72e04458))
+
 ## [1.3.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.2.1...1.3.0) (2022-04-14)
 
 
