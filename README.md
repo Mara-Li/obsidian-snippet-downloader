@@ -41,3 +41,5 @@ So, the commands added by the plugins are :
 *Credit to BRAT-42, where I take some idea and code !*
 
 💡If one day BRAT-42 or Obsidian add a similary function, this plugin will be deleted !
+
+🗒️It exists a limit of 60 API call for non identified user... That's mean you can download more than 60 times in a row ! 
