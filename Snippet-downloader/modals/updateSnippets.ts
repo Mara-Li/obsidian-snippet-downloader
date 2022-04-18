@@ -67,7 +67,7 @@ export class RepoDownloader extends FuzzySuggestModal<RepoUpdate> {
 
 }
 
-export class specificSnippetDownloader extends FuzzySuggestModal<SnippetUpdate> {
+export class SpecificSnippetDownloader extends FuzzySuggestModal<SnippetUpdate> {
 	app: App;
 	settings: SnippetDownloaderSettings;
 	plugin: snippetDownloader;

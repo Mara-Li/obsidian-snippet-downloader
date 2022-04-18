@@ -5,7 +5,7 @@ import {
 	SnippetDownloaderTabs, SnippetRepo
 } from "./settings";
 import {SnippetDownloaderModals} from "./modals/simpleCommands";
-import {RepoDownloader, specificSnippetDownloader} from "./modals/updateSnippets";
+import {RepoDownloader, SpecificSnippetDownloader} from "./modals/updateSnippets";
 import {ExcludeSnippet} from "./modals/excludeSnippet";
 import {addSnippet, updateRepo} from "./addSnippets";
 
@@ -76,7 +76,7 @@ export default class snippetDownloader extends Plugin {
 			checkCallback: (checking:boolean) => {
 				if (this.settings.snippetList.length > 0) {
 					if (!checking) {
-						new specificSnippetDownloader(this.app, this.settings, this).open();
+						new SpecificSnippetDownloader(this.app, this.settings, this).open();
 					}
 					return true;
 				}

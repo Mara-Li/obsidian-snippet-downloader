@@ -25,8 +25,8 @@ export async function addSnippet(repoPath: string, settings: SnippetDownloaderSe
 		})
 		const snippet = snippetList.find(snippet => snippet.repo === repoPath)
 		for (const snippetContents of snippet.snippetsContents) {
-			const Success=await downloadSnippet(repoPath, snippetContents.name, vault)
-			if (!Success) {
+			const success=await downloadSnippet(repoPath, snippetContents.name, vault)
+			if (!success) {
 				excludedSnippet += snippetContents.name.replace('.css', '') + ', ';
 				catchErrors.push(snippetContents.name.replace('.css', ''));
 			}

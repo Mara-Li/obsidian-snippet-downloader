@@ -29,8 +29,6 @@ export const DEFAULT_SETTINGS: SnippetDownloaderSettings = {
 	errorSnippet: "",
 };
 
-
-
 export class SnippetDownloaderTabs extends PluginSettingTab {
 	plugin: snippetDownloader;
 
@@ -50,7 +48,7 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 			.setName('Excluded Snippet')
 			.setDesc('Type the snippet name you want to exclude from the list, without the extension. Glob can work. Separate by comma.')
 			.addTextArea(text => text
-				.setPlaceholder('BadCSS I hate, badCSS(.*)')
+				.setPlaceholder('BadCSS I hate, badCSS*')
 				.setValue(this.plugin.settings.excludedSnippet)
 				.onChange(async (value) => {
 					this.plugin.settings.excludedSnippet = value;
