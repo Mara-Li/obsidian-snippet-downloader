@@ -1,4 +1,4 @@
-import {snippetDownloaderSettings, snippetRepo} from "./settings";
+import {SnippetDownloaderSettings, SnippetRepo} from "./settings";
 import {Notice, Vault} from "obsidian";
 import {
 	checkLastUpdate,
@@ -6,10 +6,10 @@ import {
 	listSnippetfromRepo
 } from "./downloader";
 import {basename, searchExcluded} from "./utils";
-import {snippetUpdate} from "./modals/updateSnippets";
+import {SnippetUpdate} from "./modals/updateSnippets";
 import {removeSnippetFromExcluded} from "./removeSnippet"
 
-export async function addSnippet(repoPath: string, settings: snippetDownloaderSettings, vault: Vault) {
+export async function addSnippet(repoPath: string, settings: SnippetDownloaderSettings, vault: Vault) {
 	const snippetList = settings.snippetList;
 	let excludedSnippet = settings.errorSnippet;
 	const catchErrors: string[] = [];
@@ -42,7 +42,7 @@ export async function addSnippet(repoPath: string, settings: snippetDownloaderSe
 	return [snippetList, excludedSnippet]
 }
 
-export async function updateRepo(repoPath: string, snippetList: snippetRepo[], vault: Vault, excludedSnippets: string, errorSnippets: string) {
+export async function updateRepo(repoPath: string, snippetList: SnippetRepo[], vault: Vault, excludedSnippets: string, errorSnippets: string) {
 	const snippet = snippetList.find(snippet => snippet.repo === repoPath);
 	if (snippet) {
 		for (const snippetContent of snippet.snippetsContents) {
@@ -62,7 +62,7 @@ export async function updateRepo(repoPath: string, snippetList: snippetRepo[], v
 	return [errorSnippets, snippetList];
 }
 
-export async function updateSpecificSnippet(item: snippetUpdate, settings: snippetDownloaderSettings) {
+export async function updateSpecificSnippet(item: SnippetUpdate, settings: SnippetDownloaderSettings) {
 	let listSnippet = settings.snippetList
 	let excludedSnippet = settings.errorSnippet
 	const snippet = listSnippet.find(snippet => snippet.repo === item.repo);

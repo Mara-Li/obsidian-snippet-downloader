@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from "obsidian";
-export class snippetDownloaderModals extends Modal {
+export class SnippetDownloaderModals extends Modal {
 	result: string;
 	onSubmit: (result: string) => void;
 

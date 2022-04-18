@@ -1,20 +1,20 @@
 import {App, FuzzySuggestModal} from "obsidian";
-import {snippetDownloaderSettings, snippetRepo} from "../settings";
+import {SnippetDownloaderSettings, SnippetRepo} from "../settings";
 import {updateRepo, updateSpecificSnippet} from "../addSnippets";
 import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
 
-interface repoUpdate {
+interface RepoUpdate {
 	repoName: string;
 	repoUrl: string;
 }
 
-export interface snippetUpdate {
+export interface SnippetUpdate {
 	repo: string;
 	snippetPath: string;
 }
 
-function getAllRepo(settings: snippetDownloaderSettings){
+function getAllRepo(settings: SnippetDownloaderSettings){
 	const repoAll=[];
 	for(const repo of settings.snippetList){
 		repoAll.push({
@@ -25,8 +25,8 @@ function getAllRepo(settings: snippetDownloaderSettings){
 	return repoAll
 }
 
-function getAllSnippet(settings: snippetDownloaderSettings) {
-	const allSnippet: snippetUpdate[] = [];
+function getAllSnippet(settings: SnippetDownloaderSettings) {
+	const allSnippet: SnippetUpdate[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {
 			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings.excludedSnippet, snippetContent.name) && !searchExcluded(settings.errorSnippet, snippetContent.name)) {
@@ -40,55 +40,55 @@ function getAllSnippet(settings: snippetDownloaderSettings) {
 	return allSnippet
 }
 
-export class repoDownloader extends FuzzySuggestModal<repoUpdate> {
+export class RepoDownloader extends FuzzySuggestModal<RepoUpdate> {
 	app: App;
-	settings: snippetDownloaderSettings;
+	settings: SnippetDownloaderSettings;
 	plugin: snippetDownloader;
 
-	constructor(app: App, settings: snippetDownloaderSettings, plugin:snippetDownloader){
+	constructor(app: App, settings: SnippetDownloaderSettings, plugin:snippetDownloader){
 		super(app);
 		this.settings = settings;
 		this.plugin = plugin;
 	}
 
-	getItemText(item: repoUpdate): string {
+	getItemText(item: RepoUpdate): string {
 		return item.repoName
 	}
-	getItems(): repoUpdate[] {
+	getItems(): RepoUpdate[] {
 		return getAllRepo(this.settings)
 	}
 
-	async onChooseItem(item: repoUpdate, evt: MouseEvent | KeyboardEvent) {
+	async onChooseItem(item: RepoUpdate, evt: MouseEvent | KeyboardEvent) {
 		const allSettings = await updateRepo(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet, this.settings.errorSnippet);
-		this.settings.snippetList =<snippetRepo[]>allSettings[1];
+		this.settings.snippetList =<SnippetRepo[]>allSettings[1];
 		this.settings.errorSnippet=<string>allSettings[0];
 		await this.plugin.saveSettings();
 	}
 
 }
 
-export class specificSnippetDownloader extends FuzzySuggestModal<snippetUpdate> {
+export class specificSnippetDownloader extends FuzzySuggestModal<SnippetUpdate> {
 	app: App;
-	settings: snippetDownloaderSettings;
+	settings: SnippetDownloaderSettings;
 	plugin: snippetDownloader;
 
-	constructor(app: App, settings: snippetDownloaderSettings, plugin: snippetDownloader) {
+	constructor(app: App, settings: SnippetDownloaderSettings, plugin: snippetDownloader) {
 		super(app);
 		this.settings = settings;
 		this.plugin = plugin;
 	}
 
-	getItemText(item: snippetUpdate): string {
+	getItemText(item: SnippetUpdate): string {
 		return basename(item.snippetPath);
 	}
 
-	getItems(): snippetUpdate[] {
+	getItems(): SnippetUpdate[] {
 		return getAllSnippet(this.settings)
 	}
 
-	async onChooseItem(item: snippetUpdate, evt: MouseEvent | KeyboardEvent) {
+	async onChooseItem(item: SnippetUpdate, evt: MouseEvent | KeyboardEvent) {
 		const newList = await updateSpecificSnippet(item, this.settings);
-		this.settings.snippetList = <snippetRepo[]>newList[0];
+		this.settings.snippetList = <SnippetRepo[]>newList[0];
 		this.settings.errorSnippet = <string>newList[1];
 		await this.plugin.saveSettings();
 	}

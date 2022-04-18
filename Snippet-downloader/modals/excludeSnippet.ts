@@ -1,16 +1,16 @@
 import {App, FuzzySuggestModal, Notice} from "obsidian";
-import {snippetDownloaderSettings, snippetRepo} from "../settings";
+import {SnippetDownloaderSettings, SnippetRepo} from "../settings";
 import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
 import {removeSnippetFromExcluded} from "../removeSnippet";
 
-interface snippetExclude {
+interface SnippetExclude {
 	repo: string;
 	snippetPath: string;
 }
 
-function getAllSnippet(settings: snippetDownloaderSettings) {
-	const allSnippet: snippetExclude[] = [];
+function getAllSnippet(settings: SnippetDownloaderSettings) {
+	const allSnippet: SnippetExclude[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {
 			if (snippetContent.name !== 'obsidian.css' && !searchExcluded(settings.excludedSnippet, snippetContent.name) && !searchExcluded(settings.errorSnippet, snippetContent.name)) {
@@ -24,35 +24,35 @@ function getAllSnippet(settings: snippetDownloaderSettings) {
 	return allSnippet
 }
 
-async function addExcludedSnippet(item: snippetExclude, settings: snippetDownloaderSettings){
+async function addExcludedSnippet(item: SnippetExclude, settings: SnippetDownloaderSettings){
 	let excludedSnippet = settings.excludedSnippet;
 	excludedSnippet = excludedSnippet + ', ' + item.snippetPath;
 	const snippetList = removeSnippetFromExcluded(item.repo, settings.snippetList, settings.errorSnippet, excludedSnippet);
 	return [snippetList, excludedSnippet];
 }
 
-export class excludeSnippet extends FuzzySuggestModal<snippetExclude> {
+export class ExcludeSnippet extends FuzzySuggestModal<SnippetExclude> {
 	app: App;
-	settings: snippetDownloaderSettings;
+	settings: SnippetDownloaderSettings;
 	plugin: snippetDownloader;
 
-	constructor(app: App, settings: snippetDownloaderSettings, plugin:snippetDownloader){
+	constructor(app: App, settings: SnippetDownloaderSettings, plugin:snippetDownloader){
 		super(app);
 		this.settings = settings;
 		this.plugin = plugin;
 	}
 
-	getItemText(item: snippetExclude): string {
+	getItemText(item: SnippetExclude): string {
 		return basename(item.snippetPath);
 	}
 
-	getItems(): snippetExclude[] {
+	getItems(): SnippetExclude[] {
 		return getAllSnippet(this.settings)
 	}
 
-	async onChooseItem(item: snippetExclude, evt: MouseEvent | KeyboardEvent) {
+	async onChooseItem(item: SnippetExclude, evt: MouseEvent | KeyboardEvent) {
 		const newSettings=await addExcludedSnippet(item, this.settings);
-		this.settings.snippetList = <snippetRepo[]>newSettings[0];
+		this.settings.snippetList = <SnippetRepo[]>newSettings[0];
 		this.settings.excludedSnippet = <string>newSettings[1];
 		await this.plugin.saveSettings();
 		new Notice(`${basename(item.snippetPath)} has been excluded! 🎉`)

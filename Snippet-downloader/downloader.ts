@@ -3,13 +3,13 @@ import { Base64 } from "js-base64";
 import { ResponseHeaders } from "@octokit/types";
 import {normalizePath, Vault, request} from "obsidian";
 import {
-	snippetDownloaderSettings,
-	snippetInformation,
+	SnippetDownloaderSettings,
+	SnippetInformation,
 } from "./settings";
 import {searchExcluded, basename} from "./utils";
 
 //@ts-ignore
-async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?: 200; url?: string; data: any; }, snippetList: snippetInformation[], settings: snippetDownloaderSettings, repoPath: string) {
+async function fetchListSnippet(repoRecur: { headers?: ResponseHeaders; status?: 200; url?: string; data: any; }, snippetList: SnippetInformation[], settings: SnippetDownloaderSettings, repoPath: string) {
 	for (const data of repoRecur.data.tree) {
 		if (data.path.endsWith('.css') && !searchExcluded(settings.excludedSnippet, data.path) && data.path != 'obsidian.css' && !searchExcluded(settings.errorSnippet, data.path)) {
 			const snippetName = data.path
@@ -46,13 +46,13 @@ export async function grabLastCommitDate(repoPath:string, filepath:string) {
 	}
 }
 
-export async function listSnippetfromRepo(repoPath: string, settings: snippetDownloaderSettings): Promise<snippetInformation[]> {
+export async function listSnippetfromRepo(repoPath: string, settings: SnippetDownloaderSettings): Promise<SnippetInformation[]> {
 	const octokit = new Octokit();
 	const repo = repoPath.replace('https://github.com/', '')
 	const owner = repo.split('/')[0]
 	const repoName = repo.split('/')[1]
 	console.log(`Repo: ${repoPath}, owner: ${owner}, repoName: ${repoName}`)
-	const snippetList: snippetInformation[] | PromiseLike<snippetInformation[]> = [];
+	const snippetList: SnippetInformation[] | PromiseLike<SnippetInformation[]> = [];
 	try {
 		const repoRecur = await octokit.request('GET /repos/{owner}/{repo}/git/trees/{tree_sha}', {
 			owner: owner,
@@ -78,7 +78,7 @@ export async function listSnippetfromRepo(repoPath: string, settings: snippetDow
 	}
 }
 
-export async function checkLastUpdate(snippetName:snippetInformation, repoPath: string) {
+export async function checkLastUpdate(snippetName:SnippetInformation, repoPath: string) {
 	const oldDate = new Date (snippetName.lastUpdate);
 	const newDate= new Date(await grabLastCommitDate(repoPath, snippetName.name));
 	return (oldDate < newDate)

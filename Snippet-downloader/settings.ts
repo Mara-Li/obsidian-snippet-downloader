@@ -7,23 +7,23 @@ import {
 import snippetDownloader from "./main";
 import {removeSnippet} from "./removeSnippet";
 
-export interface snippetInformation {
+export interface SnippetInformation {
   name: string;
   lastUpdate: string;
 }
 
-export interface snippetRepo {
+export interface SnippetRepo {
 	repo: string;
-	snippetsContents: snippetInformation[];
+	snippetsContents: SnippetInformation[];
 }
 
-export interface snippetDownloaderSettings {
-	snippetList:snippetRepo[];
+export interface SnippetDownloaderSettings {
+	snippetList:SnippetRepo[];
 	excludedSnippet:string;
 	errorSnippet: string;
 }
 
-export const DEFAULT_SETTINGS: snippetDownloaderSettings = {
+export const DEFAULT_SETTINGS: SnippetDownloaderSettings = {
 	snippetList: [],
 	excludedSnippet: "",
 	errorSnippet: "",
@@ -31,7 +31,7 @@ export const DEFAULT_SETTINGS: snippetDownloaderSettings = {
 
 
 
-export class snippetDownloaderTabs extends PluginSettingTab {
+export class SnippetDownloaderTabs extends PluginSettingTab {
 	plugin: snippetDownloader;
 
 	constructor(app: App, plugin: snippetDownloader) {
@@ -76,7 +76,7 @@ export class snippetDownloaderTabs extends PluginSettingTab {
 					btn.onClick(async()=>{
 						btn.buttonEl.parentElement.remove();
 						const newSettings=removeSnippet(repoPath.repo, this.plugin.settings.snippetList, this.plugin.settings.errorSnippet);
-						this.plugin.settings.snippetList=<snippetRepo[]>newSettings[0]
+						this.plugin.settings.snippetList=<SnippetRepo[]>newSettings[0]
 						this.plugin.settings.errorSnippet=<string>newSettings[1]
 						await this.plugin.saveSettings();
 					})
