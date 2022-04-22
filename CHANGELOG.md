@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.4.0...1.4.2) (2022-04-22)
+
+
+### Bug Fixes
+
+* Adding regex in case of glob doest work ([bec5715](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/bec571581a968153a8424bfe393193d405bc0c6f))
+
 ### 1.4.1 (2022-04-22)
 
 
