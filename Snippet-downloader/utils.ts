@@ -4,7 +4,7 @@ export function searchExcluded(excludedSnippet: string, name: string): boolean {
 	if (excludedSnippet.length < 1) {
 		return false;
 	}
-const excluded = test.split(",").map(e => {return e.trim();}).filter(x=>x.length>0)
+const excluded = excludedSnippet.split(",").map(e => {return e.trim();}).filter(x=>x.length>0)
 	for (const excl of excluded){
 		if (excl === name.replace('.css', '').trim()){
 			return true;
