@@ -10,7 +10,8 @@
 		"release": "standard-version"
 	},
 	"standard-version": {
-		"t": ""
+		"t": "",
+		"header": "# Changelog"
 	},
 	"keywords": [],
 	"author": "Mara-Li",
