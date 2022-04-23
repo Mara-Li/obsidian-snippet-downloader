@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-snippet-downloader",
-	"version": "1.4.5",
+	"version": "1.4.4",
 	"description": "A obsidian's plugin to help to manage css snippets (download / update) from repository ",
 	"main": "main.js",
 	"scripts": {
@@ -10,8 +10,7 @@
 		"release": "standard-version"
 	},
 	"standard-version": {
-		"t": "",
-		"header": "# Changelog\n\n"
+		"t": ""
 	},
 	"keywords": [],
 	"author": "Mara-Li",
