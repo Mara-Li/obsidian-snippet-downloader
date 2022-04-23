@@ -43,10 +43,19 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 		containerEl.empty();
 
 		containerEl.createEl('h2', {text: 'Snippet Manager Settings'});
-
+		const desc_excluder = document.createDocumentFragment();
+		desc_excluder.createEl('span', null, (span)=>{
+			span.innerText='Type the snippet name you want to exclude from the list, without the extension.\nYou can also use regex, for example: ';
+			span.createEl('code', {text: '^(.*)$'});
+			span.createEl('span', {text:' will match all snippets.\n\n'});
+			span.createEl('a', null, (link)=>{
+				link.innerText='You can check your regex here.';
+				link.href='https://regex101.com/';
+			})
+		})
 		new Setting(containerEl)
 			.setName('Excluded Snippet')
-			.setDesc('Type the snippet name you want to exclude from the list, without the extension. Glob and regex can work. Separate by comma.')
+			.setDesc(desc_excluder)
 			.addTextArea(text => text
 				.setPlaceholder('BadCSS I hate, badCSS*')
 				.setValue(this.plugin.settings.excludedSnippet)
@@ -62,7 +71,9 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 		containerEl.createEl("p");
 		containerEl.createEl("span")
 			.createEl("b", { text: "Note: " })
-		containerEl.createSpan({ text: "This does not delete the linked snippet, this should be done from your .obsidian/snippet folder." });
+		containerEl.createEl("span",{ text: "This does not delete the linked snippet, this should be done from your " });
+		containerEl.createEl("code", { text: ".obsidian/snippets" }).setAttribute("style", "font-family: var(--font-monospace)");
+		containerEl.createSpan({ text: " folder" });
 
 		for (const repoPath of this.plugin.settings.snippetList) {
 			const repoName = repoPath.repo.replace('https://github.com/','')
