@@ -47,9 +47,7 @@ function openDetails(name: string, detailsState: boolean) {
 	const allDetails = document.getElementsByTagName('details');
 	for (let i = 0; i<allDetails.length; i++) {
 		const details = allDetails[i] as HTMLDetailsElement;
-		console.log('STATE', detailsState)
 		if (details.innerText.split('\n')[0] === name && detailsState) {
-			console.log('OPEN')
 			details.setAttr('open', 'true');
 			details.open = true;
 			details.setAttribute('open', 'true');
@@ -119,9 +117,7 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 						new SnippetDownloaderModals(this.app, async (result) => {
 						if (result) {
 							const newSettings = await addSnippet(result.trim(), this.plugin.settings, this.app.vault);
-							this.plugin.settings.snippetList = <SnippetRepo[]>newSettings[0]
-							this.plugin.settings.errorSnippet = <string>newSettings[1]
-							await this.plugin.saveSettings();
+							await this.plugin.updateList(newSettings);
 							const detailState = getDetailsState(result);
 							this.display();
 							openDetails(result, detailState);
@@ -153,9 +149,7 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 						.onClick(async()=>{
 							btn.buttonEl.parentElement.remove();
 							const newSettings=removeSnippet(repoPath.repo, this.plugin.settings.snippetList, this.plugin.settings.errorSnippet);
-							this.plugin.settings.snippetList=<SnippetRepo[]>newSettings[0]
-							this.plugin.settings.errorSnippet=<string>newSettings[1]
-							await this.plugin.saveSettings();
+							await this.plugin.updateList(newSettings);
 							const detailState = getDetailsState(repoName);
 							this.display();
 							openDetails(repoName, detailState);
@@ -168,25 +162,20 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 						.setTooltip("Update this repository")
 						.onClick(async()=>{
 							const allSettings = await updateRepo(repoPath.repo, this.plugin.settings.snippetList, this.app.vault, this.plugin.settings.excludedSnippet, this.plugin.settings.errorSnippet);
-							console.log(allSettings);
-							this.plugin.settings.snippetList =<SnippetRepo[]>allSettings[1];
-							this.plugin.settings.errorSnippet=<string>allSettings[0];
-							await this.plugin.saveSettings();
+							await this.plugin.updateList(allSettings);
 						})
 				})
 			for(const snippets of repoPath.snippetsContents) {
 				new Setting(details)
-					.setName(snippets.name)
+					.setName(basename(snippets.name))
 					.setClass('snippets-downloader-settings')
 					.addExtraButton((btn:ExtraButtonComponent)=>{
 						btn
 							.setTooltip('Update this snippet')
 							.setIcon('install')
 							.onClick(async ()=>{
-								const updatedList = await updateSpecificSnippet(allSnippets.find(s => snippets.name === basename(s.snippetPath)), this.plugin.settings);
-								this.plugin.settings.snippetList = <SnippetRepo[]>updatedList[0];
-								this.plugin.settings.errorSnippet = <string>updatedList[1];
-								await this.plugin.saveSettings();
+								const updatedList = await updateSpecificSnippet(allSnippets.find(s => snippets.name === s.snippetPath), this.plugin.settings);
+								await this.plugin.updateList(updatedList);
 							})
 
 					})
@@ -195,13 +184,9 @@ export class SnippetDownloaderTabs extends PluginSettingTab {
 							.setTooltip('Remove this snippet')
 							.setIcon('trash')
 							.onClick(async ()=>{
-								const updatedList = await addExcludedSnippet(getExcludedSnippets(this.plugin.settings).find(s => snippets.name === basename(s.snippetPath)), this.plugin.settings);
-								this.plugin.settings.snippetList = <SnippetRepo[]>updatedList[0];
-								this.plugin.settings.errorSnippet = <string>updatedList[1];
-								await this.plugin.saveSettings();
-								const detailState = getDetailsState(repoName);
-								this.display();
-								openDetails(repoName, detailState);
+								btn.extraSettingsEl.parentElement.parentElement.remove();
+								const updatedList = await addExcludedSnippet(getExcludedSnippets(this.plugin.settings).find(s => snippets.name === s.snippetPath), this.plugin.settings);
+								await this.plugin.updateList(updatedList);
 							})
 					})
 			}
