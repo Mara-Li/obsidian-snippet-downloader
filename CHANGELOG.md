@@ -1,4 +1,11 @@
 # Changelog
+### [2.0.1](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/2.0.0...2.0.1) (2022-08-22)
+
+
+### Bug Fixes
+
+* folder path not found ([a1009e7](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/a1009e7267a022ce9cbc1a4801a56c12116abb71))
+
 ## [2.0.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.4.3...2.0.0) (2022-08-22)
 
 
