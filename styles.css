@@ -1,0 +1,18 @@
+.setting-item.snippets-downloader-settings {
+	border: none;
+	padding: 0.5em 1em;
+}
+summary.snippets-downloader-summary {
+	height: 2em;
+	margin-bottom: 1em;
+}
+.setting-item.snippets-downloader-options {
+	top:-2em;
+	position: relative;
+}
+
+button.snippets-downloader-button {
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}

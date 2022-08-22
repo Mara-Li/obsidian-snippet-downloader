@@ -59,6 +59,7 @@ export async function updateRepo(repoPath: string, snippetList: SnippetRepo[], v
 	}
 	snippetList = removeSnippetFromExcluded(repoPath,snippetList, errorSnippets, excludedSnippets);
 	new Notice(`${repoPath} successfully updated 🎉`);
+	console.log(errorSnippets, snippetList);
 	return [errorSnippets, snippetList];
 }
 

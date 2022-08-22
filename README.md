@@ -14,11 +14,13 @@ In setting, you can :
 
 So, the commands added by the plugins are :
 - **Adding new Snippet** : Use `https://github.com/username/repo` or `username/repo` to add a new repository and download the present css snippet.
-- **Update All snippet** : Update all repository and their snippet (unless you exclude them).
+- **Update all snippet** : Update all repository and their snippet (unless you exclude them).
 - **Update Specific snippet** : You can just update one snippet using its name.
 - **Update Specific Repository** : You can just update one repository using its name.
 
 💡Note : The file will be updated only if there is a new commit ! It's not based on the file contents.
+
+Also, alternatively, you can use the settings tab to add a repository, delete a repository, exclude a snippets, etc.
 
 <table>
 <tbody>

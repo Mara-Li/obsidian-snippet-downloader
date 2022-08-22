@@ -4,12 +4,12 @@ import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
 import {removeSnippetFromExcluded} from "../removeSnippet";
 
-interface SnippetExclude {
+export interface SnippetExclude {
 	repo: string;
 	snippetPath: string;
 }
 
-function getAllSnippet(settings: SnippetDownloaderSettings) {
+export function getExcludedSnippets(settings: SnippetDownloaderSettings) {
 	const allSnippet: SnippetExclude[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {
@@ -24,7 +24,7 @@ function getAllSnippet(settings: SnippetDownloaderSettings) {
 	return allSnippet
 }
 
-async function addExcludedSnippet(item: SnippetExclude, settings: SnippetDownloaderSettings){
+export async function addExcludedSnippet(item: SnippetExclude, settings: SnippetDownloaderSettings){
 	let excludedSnippet = settings.excludedSnippet;
 	excludedSnippet = excludedSnippet + ', ' + item.snippetPath;
 	const snippetList = removeSnippetFromExcluded(item.repo, settings.snippetList, settings.errorSnippet, excludedSnippet);
@@ -47,7 +47,7 @@ export class ExcludeSnippet extends FuzzySuggestModal<SnippetExclude> {
 	}
 
 	getItems(): SnippetExclude[] {
-		return getAllSnippet(this.settings)
+		return getExcludedSnippets(this.settings)
 	}
 
 	async onChooseItem(item: SnippetExclude, evt: MouseEvent | KeyboardEvent) {

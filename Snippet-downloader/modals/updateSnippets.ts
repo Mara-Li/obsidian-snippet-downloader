@@ -25,7 +25,7 @@ function getAllRepo(settings: SnippetDownloaderSettings){
 	return repoAll
 }
 
-function getAllSnippet(settings: SnippetDownloaderSettings) {
+export function getAllSnippet(settings: SnippetDownloaderSettings) {
 	const allSnippet: SnippetUpdate[] = [];
 	for (const snippet of settings.snippetList) {
 		for (const snippetContent of snippet.snippetsContents) {

@@ -97,6 +97,7 @@ export async function downloadSnippet(repoPath: string, snippetName: string, vau
 			repo: repoName,
 			path: snippetName
 		});
+		console.log(file.status)
 		if (file.status === 200) {
 			// @ts-ignore
 			const fileContent = Base64.decode(file.data.content);

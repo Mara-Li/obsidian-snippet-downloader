@@ -12,6 +12,22 @@ import {addSnippet, updateRepo} from "./addSnippets";
 export default class snippetDownloader extends Plugin {
 	settings: SnippetDownloaderSettings;
 
+	async updateAllSnippets() {
+		if (this.settings.snippetList.length > 0) {
+			const snippetList = this.settings.snippetList;
+			const errorSnippet = this.settings.errorSnippet;
+			const excludedSnippet = this.settings.excludedSnippet;
+			let updatedSettings = [errorSnippet, snippetList];
+			for (const repoName of snippetList) {
+				//@ts-ignore
+				updatedSettings= await updateRepo(repoName.repo, snippetList, this.app.vault, excludedSnippet, errorSnippet);
+				this.settings.snippetList = <SnippetRepo[]>updatedSettings[1];
+				this.settings.errorSnippet = <string>updatedSettings[0];
+			}
+			await this.saveSettings();
+		}
+	}
+
 	async onload() {
 		await this.loadSettings();
 
@@ -33,6 +49,7 @@ export default class snippetDownloader extends Plugin {
 		this.addCommand({
 			id: 'update-all-snippets',
 			name: 'Update all snippets',
+			//@ts-ignore
 			checkCallback: async (checking: boolean) => {
 				if (this.settings.snippetList.length > 0) {
 					if (!checking) {
