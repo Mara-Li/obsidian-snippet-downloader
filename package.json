@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-snippet-downloader",
-	"version": "1.4.4",
+	"version": "2.0.0",
 	"description": "A obsidian's plugin to help to manage css snippets (download / update) from repository ",
 	"main": "main.js",
 	"scripts": {

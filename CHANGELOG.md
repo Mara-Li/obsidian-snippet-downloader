@@ -1,4 +1,20 @@
 # Changelog
+## [2.0.0](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.4.3...2.0.0) (2022-08-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* Fix regex generation
+
+### Features
+
+* add commands directly on settings ([1cc042f](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/1cc042fc41d7d7bba8248f332a949eaa0f43fb2a))
+
+
+### Bug Fixes
+
+* Fix regex generation ([7f65c84](https://github.com/Mara-Li/obsidian-snippet-downloader/commit/7f65c84de5a17b0eac2784b3b5cc8f1cd516a408))
+
 ### [1.4.4](https://github.com/Mara-Li/obsidian-snippet-downloader/compare/1.4.3...1.4.4) (2022-04-23)
 
 ### 1.4.3 (2022-04-22)
