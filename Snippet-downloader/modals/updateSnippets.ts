@@ -60,9 +60,7 @@ export class RepoDownloader extends FuzzySuggestModal<RepoUpdate> {
 
 	async onChooseItem(item: RepoUpdate, evt: MouseEvent | KeyboardEvent) {
 		const allSettings = await updateRepo(item.repoName, this.settings.snippetList, this.app.vault, this.settings.excludedSnippet, this.settings.errorSnippet);
-		this.settings.snippetList =<SnippetRepo[]>allSettings[1];
-		this.settings.errorSnippet=<string>allSettings[0];
-		await this.plugin.saveSettings();
+		await this.plugin.updateList(allSettings);
 	}
 
 }
@@ -88,8 +86,6 @@ export class SpecificSnippetDownloader extends FuzzySuggestModal<SnippetUpdate> 
 
 	async onChooseItem(item: SnippetUpdate, evt: MouseEvent | KeyboardEvent) {
 		const newList = await updateSpecificSnippet(item, this.settings);
-		this.settings.snippetList = <SnippetRepo[]>newList[0];
-		this.settings.errorSnippet = <string>newList[1];
-		await this.plugin.saveSettings();
+		await this.plugin.updateList(newList);
 	}
 }

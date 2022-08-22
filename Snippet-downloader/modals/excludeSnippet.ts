@@ -1,5 +1,5 @@
 import {App, FuzzySuggestModal, Notice} from "obsidian";
-import {SnippetDownloaderSettings, SnippetRepo} from "../settings";
+import {SnippetDownloaderSettings} from "../settings";
 import snippetDownloader from "../main";
 import {basename, searchExcluded} from "../utils";
 import {removeSnippetFromExcluded} from "../removeSnippet";
@@ -52,9 +52,7 @@ export class ExcludeSnippet extends FuzzySuggestModal<SnippetExclude> {
 
 	async onChooseItem(item: SnippetExclude, evt: MouseEvent | KeyboardEvent) {
 		const newSettings=await addExcludedSnippet(item, this.settings);
-		this.settings.snippetList = <SnippetRepo[]>newSettings[0];
-		this.settings.excludedSnippet = <string>newSettings[1];
-		await this.plugin.saveSettings();
+		await this.plugin.updateList(newSettings);
 		new Notice(`${basename(item.snippetPath)} has been excluded! 🎉`)
 	}
 }

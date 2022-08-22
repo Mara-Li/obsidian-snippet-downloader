@@ -27,6 +27,12 @@ export default class snippetDownloader extends Plugin {
 			await this.saveSettings();
 		}
 	}
+	
+	async updateList(newSettings: SnippetRepo[] | (string | SnippetRepo[])[]){
+		this.settings.snippetList = <SnippetRepo[]>newSettings[0];
+		this.settings.errorSnippet = <string>newSettings[1];
+		await this.saveSettings();
+	}
 
 	async onload() {
 		await this.loadSettings();
@@ -38,9 +44,7 @@ export default class snippetDownloader extends Plugin {
 				new SnippetDownloaderModals(this.app, async (result) => {
 					if (result) {
 						const newSettings = await addSnippet(result.trim(), this.settings, this.app.vault);
-						this.settings.snippetList = <SnippetRepo[]>newSettings[0]
-						this.settings.errorSnippet = <string>newSettings[1]
-						await this.saveSettings();
+						await this.updateList(newSettings);
 					}
 				}).open();
 			}
@@ -60,8 +64,7 @@ export default class snippetDownloader extends Plugin {
 						for (const repoName of snippetList) {
 							//@ts-ignore
 							updatedSettings= await updateRepo(repoName.repo, snippetList, this.app.vault, excludedSnippet, errorSnippet);
-							this.settings.snippetList = <SnippetRepo[]>updatedSettings[1];
-							this.settings.errorSnippet = <string>updatedSettings[0];
+							await this.updateList(updatedSettings);
 						}
 						await this.saveSettings();
 					}
